@@ -93,21 +93,25 @@ def llm_query_generator(user_query: str, db_schema: str, prompt_key: str):
     5. Ensure all column names and table names match the provided schema exactly.
     """
     
-    # **CRITICAL FIX:** Sanitize the user query here in Python first.
-    # This prevents the f-string from collapsing due to quotes in the JS code, resolving the SyntaxError.
+    # **CRITICAL FIX 1:** Sanitize the user query here in Python first (Fix for line ~102 error).
+    # Escape double quotes for JS injection.
     sanitized_user_query = user_query.replace('"', '\\"')
 
+    # **CRITICAL FIX 2:** Sanitize the system instruction (Fix for line ~110 error).
+    # We must escape backslashes, backticks, and any dollar signs used in the instruction text for use in JS template literals.
+    sanitized_sys_prompt = system_instruction.replace('\\', '\\\\').replace('`', '\\`').replace('$', '\\$')
+    
     # --- JAVASCRIPT/HTML COMPONENT CODE ---
     html_code = f"""
     <script>
         const API_URL = "{API_URL}";
         const MODEL_NAME = "{MODEL_NAME}";
-        // Now using the pre-sanitized variable directly
+        // Injection of pre-sanitized user query
         const userQuery = "{sanitized_user_query}"; 
         const promptKey = "{prompt_key}";
         
-        // This is the sysPrompt line, using template literals
-        const sysPrompt = `{system_instruction.replace(/"/g, '\\"')}`;
+        // Injection of pre-sanitized system instruction
+        const sysPrompt = `{sanitized_sys_prompt}`;
         
         const payload = {{
             contents: [{{ parts: [{{ text: userQuery }}] }}],
