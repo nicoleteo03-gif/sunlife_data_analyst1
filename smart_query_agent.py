@@ -69,7 +69,7 @@ def get_table_schema(engine):
     except Exception as e:
         return f"Error fetching schema: {e}"
 
-# --- 3. LLM INTERFACE COMPONENT (FINAL FIX APPLIED HERE) ---
+# --- 3. LLM INTERFACE COMPONENT (FIXED) ---
 
 @st.experimental_fragment
 def llm_query_generator(user_query: str, db_schema: str, prompt_key: str):
@@ -92,17 +92,21 @@ def llm_query_generator(user_query: str, db_schema: str, prompt_key: str):
     4. If the user asks for a visualization or analysis, structure the query to return relevant columns for that analysis (e.g., a GROUP BY and an aggregate function).
     5. Ensure all column names and table names match the provided schema exactly.
     """
+    
+    # **CRITICAL FIX:** Sanitize the user query here in Python first.
+    # This prevents the f-string from collapsing due to quotes in the JS code, resolving the SyntaxError.
+    sanitized_user_query = user_query.replace('"', '\\"')
 
     # --- JAVASCRIPT/HTML COMPONENT CODE ---
-    # NOTE the double curly braces {{...}} which prevent Python from crashing on JS syntax.
     html_code = f"""
     <script>
         const API_URL = "{API_URL}";
         const MODEL_NAME = "{MODEL_NAME}";
-        const userQuery = "{user_query.replace(/"/g, '\\"')}";
+        // Now using the pre-sanitized variable directly
+        const userQuery = "{sanitized_user_query}"; 
         const promptKey = "{prompt_key}";
         
-        // This line is now correctly escaped to avoid the Python f-string crash
+        // This is the sysPrompt line, using template literals
         const sysPrompt = `{system_instruction.replace(/"/g, '\\"')}`;
         
         const payload = {{
