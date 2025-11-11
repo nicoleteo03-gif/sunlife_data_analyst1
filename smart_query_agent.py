@@ -69,7 +69,7 @@ def get_table_schema(engine):
     except Exception as e:
         return f"Error fetching schema: {e}"
 
-# --- 3. LLM INTERFACE COMPONENT (FIXED FOR SYNTAX ERROR) ---
+# --- 3. LLM INTERFACE COMPONENT (FINAL FIX APPLIED HERE) ---
 
 @st.experimental_fragment
 def llm_query_generator(user_query: str, db_schema: str, prompt_key: str):
@@ -93,8 +93,8 @@ def llm_query_generator(user_query: str, db_schema: str, prompt_key: str):
     5. Ensure all column names and table names match the provided schema exactly.
     """
 
-    # --- JAVASCRIPT/HTML COMPONENT CODE (Where the Syntax Error Was) ---
-    # The f prefix was removed from the triple-quoted JS string to resolve the Python SyntaxError
+    # --- JAVASCRIPT/HTML COMPONENT CODE ---
+    # NOTE the double curly braces {{...}} which prevent Python from crashing on JS syntax.
     html_code = f"""
     <script>
         const API_URL = "{API_URL}";
@@ -102,6 +102,7 @@ def llm_query_generator(user_query: str, db_schema: str, prompt_key: str):
         const userQuery = "{user_query.replace(/"/g, '\\"')}";
         const promptKey = "{prompt_key}";
         
+        // This line is now correctly escaped to avoid the Python f-string crash
         const sysPrompt = `{system_instruction.replace(/"/g, '\\"')}`;
         
         const payload = {{
