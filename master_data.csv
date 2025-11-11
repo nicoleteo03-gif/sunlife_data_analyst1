@@ -1,0 +1,5 @@
+client_name,date,amount,department,file_ext,source_file,extras,invoice,address,phone,age,gender,hobby
+John Doe,11/3/2025,"M 1,000",Finance,.txt,test1.txt,,,,,,,
+Jane Lee,3/11/2025,"R 2,500.00",Finance,.txt,test2.txt,,,,,,,
+Mei Ling,2025-11-03,"RM 1,500",HR,.txt,MeiLing.txt,"{""address"": ""123 Jalan ABC, Kuala Lumpur"", ""phone"": ""+60 12-345 6789"", ""age"": ""29"", ""gender"": ""Female"", ""hobby"": ""badminton""}",,,,,,
+Kai Xin,2025-03-08,RM 4500,Barista,.txt,KaiXin.txt,,IN-1224,Aster Residence,+60 12-6996080,18,Female,Cooking
